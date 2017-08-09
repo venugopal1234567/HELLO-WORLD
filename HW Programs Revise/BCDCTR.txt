@@ -1,0 +1,42 @@
+.model small
+.stack 64
+.data
+msg1 db " BCD up down counter$"
+Base_address equ 0e880h
+PA EQU Base_address + 00h
+PB EQU Base_address + 01h
+PC EQU Base_address + 02h
+CR EQU Base_address + 03h
+.code
+mov ax,@data
+mov ds,ax
+mov al , 80h
+mov dx , CR
+out dx,al
+lea dx , msg1
+mov ah,09h
+int 21h
+updn: mov al,0h
+      mov dx,PA
+back: out dx ,al
+     call delay
+     inc al
+     cmp al,0ah
+     jne back
+     mov al , 09h
+back1: out dx ,al
+     call delay
+     dec al
+     cmp al,0ffh
+     jne back1
+     mov ah,4ch
+     int 21h
+delay proc near
+     mov bx , 0ffffh
+b2: mov cx , 55ffh
+b1: loop b1
+dec bx
+jnz b2
+ret
+delay endp
+end

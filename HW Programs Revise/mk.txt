@@ -1,0 +1,109 @@
+.model small
+.data
+base equ 0e880h
+control equ base +03h
+porta equ base +00h
+portb equ base +01h
+portc equ base +02h
+disp1 db '01234567'
+disp2 db '89+-X/=%'
+disp3 db'CEGHIJK'
+col db(?)
+row db(?)
+key db(?)
+msg1 db 10,13,'col row key',10,13,'$'
+.code
+mov ax,@data
+mov ds,ax
+mov al,90h
+mov dx,control
+out dx,al
+repeat:mov col,1
+mov dx,portc
+mov al,01
+out dx,al
+mov dx,porta
+in al,dx
+cmp al,00
+jnz fr
+mov dx,portc
+mov al,02h
+out dx,al
+mov dx,porta
+in al,dx
+cmp al,00
+jnz sr
+mov dx,portc
+mov al,04
+out dx,al
+mov dx,porta
+in al,dx
+cmp al,00
+jnz tr
+mov ah,6
+mov dl,0ffh
+int 21h
+jz repeat
+jmp quit
+fr:call delay
+mov row,1
+mov si,offset disp1
+next1:shr al,01
+jc disp
+inc si
+inc col
+jmp next1
+sr:call delay
+mov row,2
+mov si,offset disp2
+next2:shr al,01
+jc disp
+inc si
+inc col
+jmp next2
+tr:call delay
+mov row,3
+mov si,offset disp3
+next3:shr al,01
+jc disp
+inc si
+inc col
+jmp next3
+disp:lea dx,msg1
+mov ah,09h
+int 21h
+mov dl,col
+add dl,30h
+mov ah,02h
+int 21h
+mov dl,09h
+int 21h
+mov dl,row
+add dl,30h
+mov ah,02h
+int 21h
+mov dl,09h
+int 21h
+mov dl,[si]
+mov ah,02h
+int 21h
+mov dl,09h
+int 21h
+jnz quit
+jmp repeat
+quit:mov ah,4ch
+int 21h
+delay proc
+push ax
+push cx
+mov cx,0bffh
+AGA3:mov ax,0ffffh
+again2:dec ax
+jnz again2
+loop aga3
+pop cx
+pop ax
+ret
+delay endp
+end
+

@@ -1,0 +1,50 @@
+.model small
+.stack 50
+.data
+base equ 0e880h
+porta equ base + 00h
+portb equ base + 01h
+portc equ base + 02h
+cw equ base + 03h
+mode equ 80h
+n  db 50
+n1 db 50
+.code
+start:  mov ax, @data
+        mov ds , ax
+	mov dx , cw
+	mov al , mode
+	out dx ,al
+        mov al,33h
+clk:    ror al,01  
+	mov dx , portc
+	out dx ,al
+	call delay
+        ror al ,01
+       	mov dx , portc
+	out dx ,al
+	call delay
+        dec n
+        jz aclk
+        jmp clk
+aclk:   rol al,01
+	mov dx , portc
+	out dx ,al
+	call delay
+        rol al,01
+	mov dx , portc
+	out dx ,al
+	call delay
+        dec n1
+        jz quit
+        jmp aclk
+quit:    mov ah , 4ch
+        int 21h
+
+delay:  mov bx , 0ffh
+L05:  mov cx , 0ffffh
+L8: loop L8
+        Dec Bx
+        jnz L05
+        Ret
+        End start

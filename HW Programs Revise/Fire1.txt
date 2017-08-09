@@ -1,0 +1,70 @@
+.model small
+.stack 20
+.data
+base equ 0e880h
+control equ base + 03h
+porta equ  base  + 00h
+portb equ base + 01h
+portc equ base + 02h
+
+blanks db 0,0,0,0,0,0
+fire db 0,0, 79h,77h,06h,71h
+help db 73h, 38h, 79h, 76h, 0,0
+     db 0,0,0,0,0,0,0,0,0
+.code
+start: mov ax, @data
+     mov ds, ax
+     mov al, 80h
+     mov dx, control
+     out dx , al
+     mov cx , 20
+disp:
+     mov di,50
+fire1: mov si, offset fire
+	call display
+	dec di
+        jnz fire1
+        mov di, 100
+blank1: mov si, offset blanks
+ 	call display
+        dec di
+        jnz blank1
+        mov di, 50
+help1: mov si, offset help
+	call display
+	dec di
+        jnz help1
+        loop disp
+quit:    mov ah,4ch
+  	int 21h
+display: mov dx , portc
+	mov bl,00
+Rpt1: mov al , bl
+	mov dx , portc
+	out dx ,al
+	mov dx , porta
+	lodsb
+	out dx , al
+	call delay
+	inc bl
+	cmp bl ,05
+        jle Rpt1         
+	ret
+delay 	proc near
+     	push cx
+      	push bx
+        mov cx, 0fffh
+rep2:   mov bx, 0ffh
+rep1:	dec bx
+	jnz rep1
+	loop rep2
+	pop bx
+	pop cx
+	ret
+	delay endp
+end
+	
+	
+       
+
+     
